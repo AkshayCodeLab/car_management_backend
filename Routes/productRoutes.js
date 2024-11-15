@@ -4,6 +4,7 @@ import {
   getProducts,
   getById,
   updateProduct,
+  deleteProduct,
 } from "../controllers/productController.js";
 import passport from "passport";
 
@@ -31,6 +32,12 @@ router.put(
   "/update/:id",
   passport.authenticate("jwt", { session: false }),
   updateProduct
+);
+
+router.delete(
+  "/delete/:id",
+  passport.authenticate("jwt", { session: false }),
+  deleteProduct
 );
 
 export default router;
