@@ -6,7 +6,7 @@ const localDB = process.env.DB_URL;
 
 const connectDB = () => {
   mongoose
-    .connect(localDB + "/userDB")
+    .connect(localDB)
     .then(() => {
       console.log("Successfully logged into database.");
     })
