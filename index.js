@@ -23,7 +23,6 @@ app.use("/products", productRoutes);
 
 passportConfig();
 
-// Protected route
 app.get(
   "/protected",
   passport.authenticate("jwt", { session: false }),
