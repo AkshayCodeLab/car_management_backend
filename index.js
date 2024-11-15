@@ -3,10 +3,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./db.js";
 import passport from "passport";
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "./models/User.js";
+import passportConfig from "./passportConfig.js";
+import Product from "./models/Product.js";
 dotenv.config();
 const port = process.env.PORT;
 
@@ -17,24 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
 
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
-};
-
-passport.use(
-  new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
-    try {
-      const user = await User.findById(jwtPayload.sub);
-      if (user) {
-        return done(null, user);
-      }
-      return done(null, false);
-    } catch (err) {
-      return done(err, false);
-    }
-  })
-);
+passportConfig();
 
 app.post("/register", async (req, res) => {
   const { username, password, email } = req.body;
@@ -61,7 +45,9 @@ app.post("/login", async (req, res) => {
       return res.status(401).send("Invalid credentials");
     }
 
-    const token = jwt.sign({ sub: user.id }, "secret", { expiresIn: "1h" }); // Token with user ID
+    const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    }); // Token with user ID
     res.json({ token });
   } catch (err) {
     res.status(500).send("Error logging in: " + err.message);
@@ -73,7 +59,36 @@ app.get(
   "/protected",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    res.json({ message: `Hello, ${req.user.username}! You are authorized.` });
+    res.json({ message: `Hello, ${req.user}! You are authorized.` });
+  }
+);
+
+app.post(
+  "/create",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const { title, description, tags, imgUrl } = req.body;
+
+    try {
+      const newProduct = new Product({
+        title: title,
+        description: description,
+        tags: tags,
+        imgUrl: imgUrl,
+      });
+      await newProduct.save();
+
+      req.user.products.push(newProduct._id);
+
+      await req.user.save();
+
+      res.status(201).json({
+        message: "Product created and associated with the user successfully.",
+        product: newProduct,
+      });
+    } catch (error) {
+      res.status(500).send("Error creating the product: " + err.message);
+    }
   }
 );
 
