@@ -1,0 +1,18 @@
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
+
+const localDB = process.env.DB_URL;
+
+const connectDB = () => {
+  mongoose
+    .connect(localDB + "/userDB")
+    .then(() => {
+      console.log("Successfully logged into database.");
+    })
+    .catch((e) => {
+      console.log("This is the error : " + e);
+    });
+};
+
+export default connectDB;
