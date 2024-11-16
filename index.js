@@ -7,6 +7,7 @@ import {
   passportConfig,
   authRoutes,
   productRoutes,
+  documentationRoutes,
 } from "./Utils/index.js";
 
 dotenv.config();
@@ -20,16 +21,9 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
+app.use("/", documentationRoutes);
 
 passportConfig();
-
-app.get(
-  "/protected",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    res.json({ message: `Hello, ${req.user}! You are authorized.` });
-  }
-);
 
 app.listen(port, () => {
   console.log(`Listening on Port: ${port}`);

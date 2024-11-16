@@ -6,6 +6,7 @@ import passport from "passport";
 import passportConfig from "../Config/passportConfig.js";
 import authRoutes from "../Routes/authRoutes.js";
 import productRoutes from "../Routes/productRoutes.js";
+import documentationRoutes from "../Routes/documentationRoutes.js";
 
 export {
   express,
@@ -16,4 +17,5 @@ export {
   passportConfig,
   authRoutes,
   productRoutes,
+  documentationRoutes,
 };
