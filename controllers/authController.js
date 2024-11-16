@@ -7,7 +7,11 @@ export const register = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, password: hashedPassword, email });
+    const newUser = new User({
+      username: username,
+      password: hashedPassword,
+      email: email,
+    });
     await newUser.save();
     res.status(201).send("User registered successfully");
   } catch (err) {
@@ -16,10 +20,10 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { password, email, username } = req.body;
+  const { password, email } = req.body;
 
   try {
-    const user = await User.findOne({ username, email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).send("Invalid credentials");
     }
