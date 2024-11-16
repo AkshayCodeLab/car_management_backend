@@ -102,3 +102,31 @@ export const deleteProduct = async (req, res) => {
     res.status(500).send("Error deleting the product: " + error.message);
   }
 };
+
+export const searchProducts = async (req, res) => {
+  const { keyword } = req.query;
+
+  try {
+    if (!keyword) {
+      return res.status(400).json({ message: "Search keyword is required" });
+    }
+
+    const userWithProducts = await req.user.populate("products");
+
+    const searchResults = userWithProducts.products.filter((product) => {
+      const regex = new RegExp(keyword, "i");
+      return (
+        regex.test(product.title) ||
+        regex.test(product.description) ||
+        product.tags.some((tag) => regex.test(tag))
+      );
+    });
+
+    res.status(200).json({
+      message: "Search results fetched successfully",
+      products: searchResults,
+    });
+  } catch (error) {
+    res.status(500).send("Error searching products: " + error.message);
+  }
+};

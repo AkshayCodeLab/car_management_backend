@@ -11,7 +11,7 @@ const connectDB = () => {
       console.log("Successfully logged into database.");
     })
     .catch((e) => {
-      console.log("This is the error : " + e);
+      console.log("This is the error in logging in database : " + e);
     });
 };
 
